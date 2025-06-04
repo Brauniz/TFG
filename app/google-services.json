@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "304438490373",
+    "project_id": "changeho-e02d4",
+    "storage_bucket": "changeho-e02d4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304438490373:android:24684388a1de72ca9eb36c",
+        "android_client_info": {
+          "package_name": "com.example.changehome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBetEZW05gtx0eJz4x1oLWDTrGQtolCPfA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

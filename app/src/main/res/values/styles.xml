@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Tema de tu app que hereda de AppCompat -->
+    <style name="Theme.ChangeHome" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Personaliza los colores si lo deseas -->
+        <item name="colorPrimary">@color/primario</item>
+        <item name="colorPrimaryDark">@color/terciario</item>
+        <item name="colorAccent">@color/acentuado</item>
+    </style>
+
+</resources>
