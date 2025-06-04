@@ -7,17 +7,12 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.example.changehome.R;
 import com.example.changehome.adaptador.ImageCarouselAdapter;
 import com.example.changehome.modelo.entidades.Vivienda;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,11 +21,11 @@ public class ViviendaActivity extends AppCompatActivity {
 
     private static final String TAG = "ViviendaActivity";
     public static final String EXTRA_VIVIENDA_ID = "vivienda_id";
-    public static final String EXTRA_VIVIENDA_OBJECT = "vivienda_object";
+    public static final String EXTRA_VIVIENDA_OBJECT = "vivienda_objeto"; // Cambiado para coincidir con el adapter
 
     // Vistas del layout
     private ViewPager2 viewPagerVivienda;
-    private ImageButton btnPrev, btnNext;
+    private ImageButton btnPrev, btnNext, btnGoBack;
     private TextView tvUbicacion, tvDatos, tvEtiquetas, tvContEtiquetas, tvDescripcion, tvContTiempo;
 
     // Datos
@@ -55,6 +50,7 @@ public class ViviendaActivity extends AppCompatActivity {
         viewPagerVivienda = findViewById(R.id.viewPagerVivienda);
         btnPrev = findViewById(R.id.btn_prev);
         btnNext = findViewById(R.id.btn_next);
+        btnGoBack = findViewById(R.id.go_back);
         tvUbicacion = findViewById(R.id.Ubicacion);
         tvDatos = findViewById(R.id.Datos);
         tvEtiquetas = findViewById(R.id.tvetiquetas);
@@ -71,9 +67,19 @@ public class ViviendaActivity extends AppCompatActivity {
     }
 
     private void obtenerDatosVivienda() {
-        // Intentar obtener la vivienda del Intent
+        // Intentar obtener la vivienda del Intent - probando múltiples formas
         vivienda = (Vivienda) getIntent().getSerializableExtra(EXTRA_VIVIENDA_OBJECT);
+
+        // Si no funciona con la primera clave, probar las que usa el adapter
+        if (vivienda == null) {
+            vivienda = (Vivienda) getIntent().getSerializableExtra("vivienda_objeto");
+        }
+
+        // También obtener datos individuales del Intent como respaldo
         String viviendaId = getIntent().getStringExtra(EXTRA_VIVIENDA_ID);
+        if (viviendaId == null) {
+            viviendaId = getIntent().getStringExtra("vivienda_id");
+        }
 
         if (vivienda != null) {
             // Si ya tenemos el objeto completo, mostrar datos
@@ -84,6 +90,27 @@ public class ViviendaActivity extends AppCompatActivity {
             Log.d(TAG, "Buscando vivienda por ID: " + viviendaId);
             buscarViviendaPorId(viviendaId);
         } else {
+            // Como último recurso, crear vivienda con datos individuales del Intent
+            crearViviendaDesdeIntent();
+        }
+    }
+
+    private void crearViviendaDesdeIntent() {
+        Intent intent = getIntent();
+        String titulo = intent.getStringExtra("vivienda_titulo");
+        String subtitulo = intent.getStringExtra("vivienda_subtitulo");
+        String descripcion = intent.getStringExtra("vivienda_descripcion");
+        String imagen = intent.getStringExtra("vivienda_imagen");
+        String ciudad = intent.getStringExtra("vivienda_ciudad");
+        String id = intent.getStringExtra("vivienda_id");
+
+        if (titulo != null) {
+            // Crear objeto vivienda con los datos recibidos
+            vivienda = new Vivienda(imagen, titulo, subtitulo, descripcion, ciudad);
+            vivienda.setDocumentId(id);
+            Log.d(TAG, "Vivienda creada desde datos del Intent: " + titulo);
+            mostrarDatosVivienda();
+        } else {
             // Error: no hay datos
             Log.e(TAG, "No se recibieron datos de vivienda");
             Toast.makeText(this, "Error: No se encontraron datos de la vivienda", Toast.LENGTH_LONG).show();
@@ -92,7 +119,8 @@ public class ViviendaActivity extends AppCompatActivity {
     }
 
     private void buscarViviendaPorId(String viviendaId) {
-        firestore.collection("vivienda")
+        // Corregir el nombre de la colección
+        firestore.collection("viviendas") // Era "vivienda", debería ser "viviendas"
                 .document(viviendaId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -159,7 +187,7 @@ public class ViviendaActivity extends AppCompatActivity {
             imagenesVivienda.add(vivienda.getImagen());
         }
 
-        // Agregar imágenes adicionales (puedes expandir esto si tienes múltiples imágenes)
+        // Agregar imágenes adicionales
         agregarImagenesAdicionales();
 
         // Si no hay imágenes, usar imagen por defecto
@@ -201,6 +229,12 @@ public class ViviendaActivity extends AppCompatActivity {
     }
 
     private void setupNavigation() {
+        // Botón de retroceso
+        btnGoBack.setOnClickListener(v -> {
+            onBackPressed();
+        });
+
+        // Navegación del carrusel
         btnPrev.setOnClickListener(v -> {
             int currentItem = viewPagerVivienda.getCurrentItem();
             if (currentItem > 0) {
@@ -220,6 +254,9 @@ public class ViviendaActivity extends AppCompatActivity {
         // Mostrar/ocultar botones según la posición
         btnPrev.setVisibility(position > 0 ? View.VISIBLE : View.INVISIBLE);
         btnNext.setVisibility(position < imagenesVivienda.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+
+        // Opcional: Mostrar indicador de posición
+        Log.d(TAG, "Imagen " + (position + 1) + " de " + imagenesVivienda.size());
     }
 
     private void mostrarError(String mensaje) {
@@ -228,7 +265,7 @@ public class ViviendaActivity extends AppCompatActivity {
         finish();
     }
 
-    // Método estático para crear Intent
+    // Métodos estáticos para crear Intent (mejorados para compatibilidad)
     public static Intent createIntent(AppCompatActivity activity, Vivienda vivienda) {
         Intent intent = new Intent(activity, ViviendaActivity.class);
         intent.putExtra(EXTRA_VIVIENDA_OBJECT, vivienda);

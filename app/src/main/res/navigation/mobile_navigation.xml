@@ -7,19 +7,31 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.changehome.ui.home.HomeFragment"
+        android:name="com.example.changehome.fragments.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.changehome.ui.dashboard.DashboardFragment"
+        android:name="com.example.changehome.fragments.ContactFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_contacts" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.changehome.ui.notifications.NotificationsFragment"
+        android:name="com.example.changehome.fragments.SearchFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/navigation_add"
+        android:name="com.example.changehome.fragments.AddFragment"
+
+        tools:layout="@layout/fragment_add" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.changehome.fragments.SettingsFragment"
+
+        tools:layout="@layout/fragment_settings" />
 </navigation>

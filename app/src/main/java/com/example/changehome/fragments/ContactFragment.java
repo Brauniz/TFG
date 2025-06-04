@@ -30,7 +30,6 @@ public class ContactFragment extends Fragment implements ContactAdapter.OnContac
     private EditText searchEditText;
     private FirebaseFirestore db;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,8 +53,8 @@ public class ContactFragment extends Fragment implements ContactAdapter.OnContac
     }
 
     private void setupRecyclerView() {
-        // Consulta base para todos los contactos ordenados por nombre
-        Query baseQuery = db.collection("contacts").orderBy("name");
+        // CORREGIDO: Consulta a la colección "users" ordenada por nombre
+        Query baseQuery = db.collection("users").orderBy("name");
 
         // Configurar opciones para el adaptador Firestore
         FirestoreRecyclerOptions<Contact> options = new FirestoreRecyclerOptions.Builder<Contact>()
@@ -92,9 +91,11 @@ public class ContactFragment extends Fragment implements ContactAdapter.OnContac
         Query searchQuery;
 
         if (searchText.isEmpty()) {
-            searchQuery = db.collection("contacts").orderBy("name");
+            // CORREGIDO: Buscar en "users" en lugar de "contacts"
+            searchQuery = db.collection("users").orderBy("name");
         } else {
-            searchQuery = db.collection("contacts")
+            // CORREGIDO: Buscar en "users" con filtro de texto
+            searchQuery = db.collection("users")
                     .orderBy("name")
                     .startAt(searchText)
                     .endAt(searchText + "\uf8ff");
@@ -112,7 +113,7 @@ public class ContactFragment extends Fragment implements ContactAdapter.OnContac
         super.onStart();
         if (contactAdapter != null) {
             contactAdapter.startListening();
-            Log.d(TAG, "Adaptador iniciado - escuchando cambios");
+            Log.d(TAG, "Adaptador iniciado - escuchando cambios en users");
         }
     }
 
@@ -125,54 +126,67 @@ public class ContactFragment extends Fragment implements ContactAdapter.OnContac
         }
     }
 
+    // Implementación de los métodos del listener para DocumentSnapshot
     @Override
     public void onContactClick(DocumentSnapshot documentSnapshot, int position) {
-
+        Contact contact = documentSnapshot.toObject(Contact.class);
+        if (contact != null) {
+            Toast.makeText(getContext(), "Usuario: " + contact.getName(), Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Click en usuario: " + contact.getName() + " - Email: " + contact.getEmail());
+        }
     }
 
     @Override
     public void onContactLongClick(DocumentSnapshot documentSnapshot, int position) {
-
+        Contact contact = documentSnapshot.toObject(Contact.class);
+        if (contact != null) {
+            Toast.makeText(getContext(), "Email: " + contact.getEmail(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Click largo en usuario: " + contact.getName());
+        }
     }
 
-    // Implementación de los métodos del listener
+    // Implementación de los métodos del listener para Contact
     @Override
     public void onContactClick(Contact contact, int position) {
-        Toast.makeText(getContext(), "Contacto: " + contact.getName(), Toast.LENGTH_SHORT).show();
-        // Aquí puedes implementar acciones al hacer click
+        Toast.makeText(getContext(), "Usuario: " + contact.getName(), Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Usuario seleccionado: " + contact.getName() + " - " + contact.getEmail());
     }
 
     @Override
     public void onContactLongClick(Contact contact, int position) {
-        Toast.makeText(getContext(), "Click largo en: " + contact.getName(), Toast.LENGTH_SHORT).show();
-        // Aquí puedes implementar acciones al hacer click largo
+        Toast.makeText(getContext(), "Email: " + contact.getEmail(), Toast.LENGTH_LONG).show();
+        Log.d(TAG, "Click largo en: " + contact.getName());
     }
 
-    // Método para agregar nuevo contacto
-    public void addNewContact(Contact contact) {
-        db.collection("contacts")
-                .add(contact)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Contacto agregado", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Contacto agregado con ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al agregar", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error al agregar contacto", e);
-                });
+    // ELIMINADO: Métodos para agregar/eliminar contactos ya que trabajamos con users registrados
+    // Los usuarios se crean cuando se registran en Firebase Auth, no manualmente
+
+    // Método opcional para refrescar la lista
+    public void refreshUsers() {
+        if (contactAdapter != null) {
+            contactAdapter.notifyDataSetChanged();
+            Log.d(TAG, "Lista de usuarios actualizada");
+        }
     }
 
-    // Método para eliminar contacto
-    public void deleteContact(String documentId) {
-        db.collection("contacts").document(documentId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Contacto eliminado", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Documento eliminado: " + documentId);
+    // Método para obtener información de un usuario específico
+    public void getUserInfo(String userId) {
+        db.collection("users").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Contact user = documentSnapshot.toObject(Contact.class);
+                        if (user != null) {
+                            String info = "Nombre: " + user.getName() + "\nEmail: " + user.getEmail();
+                            Toast.makeText(getContext(), info, Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Usuario no encontrado", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error al eliminar documento", e);
+                    Toast.makeText(getContext(), "Error al obtener usuario", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error obteniendo usuario: " + userId, e);
                 });
     }
 }

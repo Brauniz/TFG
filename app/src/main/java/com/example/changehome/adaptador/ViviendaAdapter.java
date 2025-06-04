@@ -1,6 +1,7 @@
 package com.example.changehome.adaptador;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,15 +10,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.changehome.R;
+import com.example.changehome.activities.ViviendaActivity;
 import com.example.changehome.modelo.entidades.Vivienda;
-
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import java.util.List;
 
 public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.ViviendaViewHolder> {
@@ -26,6 +27,7 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
     private Context context;
     private List<Vivienda> listaViviendas;
     private OnViviendaClickListener listener;
+    private FirebaseStorage storage;
 
     // Interface para manejar clicks
     public interface OnViviendaClickListener {
@@ -36,6 +38,7 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
     public ViviendaAdapter(Context context, List<Vivienda> listaViviendas) {
         this.context = context;
         this.listaViviendas = listaViviendas;
+        this.storage = FirebaseStorage.getInstance();
     }
 
     // Método para establecer el listener
@@ -89,17 +92,35 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
     }
 
     private void cargarImagen(ViviendaViewHolder holder, Vivienda vivienda) {
-        // Cargar imagen desde Firestore (URL) o usar imagen por defecto
         if (vivienda.getImagen() != null && !vivienda.getImagen().trim().isEmpty()) {
-            Log.d(TAG, "Cargando imagen desde URL: " + vivienda.getImagen());
+            Log.d(TAG, "Cargando imagen: " + vivienda.getImagen());
 
-            Glide.with(context)
-                    .load(vivienda.getImagen())
-                    .placeholder(R.drawable.prueba) // Imagen mientras carga
-                    .error(R.drawable.prueba)       // Imagen si falla la carga
-                    .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache para mejor rendimiento
-                    .centerCrop() // Ajustar imagen al ImageView
-                    .into(holder.imagen);
+            // Verificar si es una referencia de Firebase Storage o URL directa
+            if (vivienda.getImagen().startsWith("gs://") || vivienda.getImagen().startsWith("viviendas/")) {
+                // Es una referencia de Firebase Storage
+                StorageReference imageRef = storage.getReference().child(vivienda.getImagen());
+                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    Glide.with(context)
+                            .load(uri)
+                            .placeholder(R.drawable.prueba)
+                            .error(R.drawable.prueba)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .centerCrop()
+                            .into(holder.imagen);
+                }).addOnFailureListener(exception -> {
+                    Log.e(TAG, "Error al cargar imagen desde Storage: " + exception.getMessage());
+                    holder.imagen.setImageResource(R.drawable.prueba);
+                });
+            } else {
+                // Es una URL directa
+                Glide.with(context)
+                        .load(vivienda.getImagen())
+                        .placeholder(R.drawable.prueba)
+                        .error(R.drawable.prueba)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop()
+                        .into(holder.imagen);
+            }
         } else {
             Log.w(TAG, "Vivienda sin imagen, usando imagen por defecto: " + vivienda.getDocumentId());
             holder.imagen.setImageResource(R.drawable.prueba);
@@ -112,8 +133,8 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
             if (listener != null) {
                 listener.onViviendaClick(vivienda, position);
             } else {
-                // Acción por defecto si no hay listener
-                Toast.makeText(context, "Vivienda: " + vivienda.getTitulo(), Toast.LENGTH_SHORT).show();
+                // Acción por defecto: abrir ViviendaActivity
+                abrirViviendaActivity(vivienda);
             }
         });
 
@@ -126,6 +147,25 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
                 Toast.makeText(context, "Contactar por: " + vivienda.getTitulo(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Método auxiliar para abrir ViviendaActivity
+    private void abrirViviendaActivity(Vivienda vivienda) {
+        Intent intent = new Intent(context, ViviendaActivity.class);
+
+        // Pasar todos los datos de la vivienda
+        intent.putExtra("vivienda_id", vivienda.getDocumentId());
+        intent.putExtra("vivienda_titulo", vivienda.getTitulo());
+        intent.putExtra("vivienda_subtitulo", vivienda.getSubtitulo());
+        intent.putExtra("vivienda_descripcion", vivienda.getDescripcion());
+        intent.putExtra("vivienda_imagen", vivienda.getImagen());
+        intent.putExtra("vivienda_ciudad", vivienda.getCiudad());
+
+        // También pasar el objeto completo (requiere que Vivienda implemente Serializable)
+        intent.putExtra("vivienda_objeto", vivienda);
+
+        context.startActivity(intent);
+        Log.d(TAG, "Abriendo ViviendaActivity para: " + vivienda.getTitulo());
     }
 
     @Override
@@ -148,8 +188,8 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
     // Método para agregar una vivienda
     public void agregarVivienda(Vivienda vivienda) {
         if (vivienda != null && listaViviendas != null) {
-            listaViviendas.add(vivienda);
-            notifyItemInserted(listaViviendas.size() - 1);
+            listaViviendas.add(0, vivienda); // Agregar al inicio para mostrar las más recientes primero
+            notifyItemInserted(0);
             Log.d(TAG, "Vivienda agregada: " + vivienda.getTitulo());
         }
     }
@@ -159,6 +199,7 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
         if (listaViviendas != null && position >= 0 && position < listaViviendas.size()) {
             Vivienda viviendaEliminada = listaViviendas.remove(position);
             notifyItemRemoved(position);
+            notifyItemRangeChanged(position, listaViviendas.size());
             Log.d(TAG, "Vivienda eliminada: " + viviendaEliminada.getTitulo());
         }
     }
@@ -169,6 +210,21 @@ public class ViviendaAdapter extends RecyclerView.Adapter<ViviendaAdapter.Vivien
             return listaViviendas.get(position);
         }
         return null;
+    }
+
+    // Método para limpiar la lista
+    public void limpiarLista() {
+        if (listaViviendas != null) {
+            int size = listaViviendas.size();
+            listaViviendas.clear();
+            notifyItemRangeRemoved(0, size);
+            Log.d(TAG, "Lista limpiada");
+        }
+    }
+
+    // Método para verificar si la lista está vacía
+    public boolean estaVacia() {
+        return listaViviendas == null || listaViviendas.isEmpty();
     }
 
     public static class ViviendaViewHolder extends RecyclerView.ViewHolder {

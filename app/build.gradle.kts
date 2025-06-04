@@ -50,6 +50,7 @@ dependencies {
 
     // Tus dependencias existentes
     implementation(libs.glide)
+    implementation(libs.firebase.storage)
     annotationProcessor(libs.glideCompiler)
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -85,4 +85,6 @@ public class Vivienda implements Serializable {
                 ", ciudad='" + ciudad + '\'' +
                 '}';
     }
+
+
 }

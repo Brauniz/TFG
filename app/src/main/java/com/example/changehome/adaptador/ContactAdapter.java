@@ -21,14 +21,11 @@ public class ContactAdapter extends FirestoreRecyclerAdapter<Contact, ContactAda
     private Context context;
     private OnContactClickListener listener;
 
-    // Interface para manejar clicks en los items
+    // Interface simplificada para manejar clicks en los items
     public interface OnContactClickListener {
         void onContactClick(DocumentSnapshot documentSnapshot, int position);
         void onContactLongClick(DocumentSnapshot documentSnapshot, int position);
-
-        // Implementación de los métodos del listener
         void onContactClick(Contact contact, int position);
-
         void onContactLongClick(Contact contact, int position);
     }
 
@@ -57,7 +54,7 @@ public class ContactAdapter extends FirestoreRecyclerAdapter<Contact, ContactAda
     public class ContactViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgProfile;
         private TextView txtName;
-        private TextView txtPhone;
+        private TextView txtPhone; // Mantenemos txtPhone como en tu layout
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -67,19 +64,30 @@ public class ContactAdapter extends FirestoreRecyclerAdapter<Contact, ContactAda
         }
 
         public void bind(Contact contact, DocumentSnapshot documentSnapshot) {
-            txtName.setText(contact.getName());
-            txtPhone.setText(contact.getUserName());
+            // Mostrar nombre del usuario
+            if (contact.getName() != null && !contact.getName().isEmpty()) {
+                txtName.setText(contact.getName());
+            } else {
+                txtName.setText("Usuario sin nombre");
+            }
 
-            // Cargar imagen con Glide
-            if (contact.getImageUrl() != null && !contact.getImageUrl().isEmpty()) {
+            // Mostrar email en el campo txtPhone (según tu layout)
+            if (contact.getEmail() != null && !contact.getEmail().isEmpty()) {
+                txtPhone.setText(contact.getEmail());
+            } else {
+                txtPhone.setText("Sin email");
+            }
+
+            // Cargar imagen de perfil con Glide - SIN circleCrop porque tu layout ya tiene clipToOutline
+            if (contact.getProfileImageUrl() != null && !contact.getProfileImageUrl().isEmpty()) {
                 Glide.with(context)
-                        .load(contact.getImageUrl())
+                        .load(contact.getProfileImageUrl())
                         .apply(new RequestOptions()
                                 .placeholder(R.drawable.hunter)
-                                .error(R.drawable.hunter)
-                                .circleCrop())
+                                .error(R.drawable.hunter))
                         .into(imgProfile);
             } else {
+                // Usar imagen por defecto si no hay imagen de perfil
                 imgProfile.setImageResource(R.drawable.hunter);
             }
 
@@ -87,12 +95,14 @@ public class ContactAdapter extends FirestoreRecyclerAdapter<Contact, ContactAda
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                     listener.onContactClick(documentSnapshot, getAdapterPosition());
+                    listener.onContactClick(contact, getAdapterPosition());
                 }
             });
 
             itemView.setOnLongClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                     listener.onContactLongClick(documentSnapshot, getAdapterPosition());
+                    listener.onContactLongClick(contact, getAdapterPosition());
                     return true;
                 }
                 return false;
@@ -100,10 +110,18 @@ public class ContactAdapter extends FirestoreRecyclerAdapter<Contact, ContactAda
         }
     }
 
-    // Método para filtrar contactos (opcional - implementación alternativa)
-    public void filter(String query) {
-        // Esta implementación requiere que la Activity/Fragment maneje una nueva consulta
-        // y actualice las opciones del adaptador usando updateOptions()
-        throw new UnsupportedOperationException("Use updateOptions() with a new query instead");
+    // Método para obtener un contacto en una posición específica
+    public Contact getContact(int position) {
+        return getItem(position);
+    }
+
+    // Método para obtener el DocumentSnapshot en una posición específica
+    public DocumentSnapshot getSnapshot(int position) {
+        return getSnapshots().getSnapshot(position);
+    }
+
+    // Método para obtener el ID del documento en una posición específica
+    public String getDocumentId(int position) {
+        return getSnapshots().getSnapshot(position).getId();
     }
 }

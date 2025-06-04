@@ -3,23 +3,42 @@ package com.example.changehome.modelo.entidades;
 import com.google.firebase.firestore.DocumentId;
 
 public class Contact {
-    @DocumentId
-    private String id; // ID del documento en Firebase
-    private String name;
-    private String userName;
-    private String imageUrl;
 
-    public Contact() {
-        // Constructor vacío necesario para Firebase
+    @DocumentId
+    private String documentId;
+    private String name;
+    private String email;
+    private String uid; // UID de Firebase Auth
+    private String profileImageUrl;
+    private long createdAt;
+
+    // Constructor vacío requerido para Firebase
+    public Contact() {}
+
+    // Constructor con parámetros
+    public Contact(String name, String email, String uid) {
+        this.name = name;
+        this.email = email;
+        this.uid = uid;
+        this.createdAt = System.currentTimeMillis();
+    }
+
+    // Constructor completo
+    public Contact(String name, String email, String uid, String profileImageUrl) {
+        this.name = name;
+        this.email = email;
+        this.uid = uid;
+        this.profileImageUrl = profileImageUrl;
+        this.createdAt = System.currentTimeMillis();
     }
 
     // Getters y Setters
-    public String getId() {
-        return id;
+    public String getDocumentId() {
+        return documentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getName() {
@@ -30,29 +49,47 @@ public class Contact {
         this.name = name;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getUid() {
+        return uid;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override
     public String toString() {
         return "Contact{" +
-                "id='" + id + '\'' +
+                "documentId='" + documentId + '\'' +
                 ", name='" + name + '\'' +
-                ", userName='" + userName + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", email='" + email + '\'' +
+                ", uid='" + uid + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }
