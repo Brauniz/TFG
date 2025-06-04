@@ -6,16 +6,6 @@
     android:background="@color/terciario"
     android:padding="8dp">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="@android:color/white"/>
-
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/propertyRecyclerView"
         android:layout_width="match_parent"

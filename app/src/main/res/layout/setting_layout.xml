@@ -17,15 +17,13 @@
         android:gravity="center_vertical"
         android:background="@color/cuaternario">
 
-        <!-- Imagen circular -->
         <ImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="12dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/circle_background"
-            android:clipToOutline="true" />
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <!-- Imagen circular -->
 
         <!-- Nombre y teléfono -->
         <LinearLayout
@@ -52,10 +50,5 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/chat_image"
-            />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

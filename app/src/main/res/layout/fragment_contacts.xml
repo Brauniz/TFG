@@ -4,12 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="top"
     android:background="@color/terciario"
-    android:fitsSystemWindows="true"
     android:padding="8dp">
 
-    <!-- CardView de búsqueda -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,6 +42,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:hint="Search..."
+                android:fontFamily="@font/fredoka_one"
                 android:inputType="text"
                 android:padding="0dp"
                 android:textColor="@android:color/black"
@@ -54,7 +52,6 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- RecyclerView ajustado -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/propertyRecyclerView"
         android:layout_width="match_parent"
@@ -62,4 +59,5 @@
         android:layout_margin="12dp"
         android:layout_weight="1"
         android:paddingTop="8dp" />
+
 </LinearLayout>
