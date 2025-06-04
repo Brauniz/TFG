@@ -152,7 +152,7 @@ public class HomeFragment extends Fragment implements ViviendaAdapter.OnVivienda
     // Implementación de los listeners del adapter
     @Override
     public void onViviendaClick(Vivienda vivienda, int position) {
-        Log.d(TAG, "Click en vivienda: " + vivienda.getTitulo());
+        Log.d(TAG, "Click en vivienda: " + vivienda.getTitulo() + " (Ciudad: " + vivienda.getCiudad() + ")");
 
         // Crear Intent para abrir ViviendaActivity
         Intent intent = ViviendaActivity.createIntent((AppCompatActivity) requireActivity(), vivienda);

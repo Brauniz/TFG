@@ -8,17 +8,59 @@
     android:background="@color/white"
     tools:context=".activities.ViviendaActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/go_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="12dp"
+            android:background="@color/transparente"
+            android:padding="4dp"
+            android:src="@drawable/flecha_atras"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/Ubicacion"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/fredoka_one"
+            android:gravity="center"
+            android:text="Ubicación :"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/Datos"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:fontFamily="@font/fredoka_one"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+
     <!-- Carrusel de imágenes -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerVivienda"
         android:layout_width="380dp"
         android:layout_height="320dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <!-- Botón Anterior -->
     <ImageButton
@@ -67,30 +109,7 @@
                 android:layout_marginTop="16dp"
                 android:src="@drawable/separador" />
             <!-- Ubicación -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
 
-                <TextView
-                    android:id="@+id/Ubicacion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Ubicación :"
-                    android:fontFamily="@font/fredoka_one"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/Datos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:fontFamily="@font/fredoka_one"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
 
             <!-- Etiquetas -->
             <LinearLayout
