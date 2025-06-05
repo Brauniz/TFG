@@ -12,7 +12,7 @@ import com.example.changehome.fragments.AddFragment;
 import com.example.changehome.fragments.SearchFragment;
 import com.example.changehome.fragments.ContactFragment;
 import com.example.changehome.fragments.SettingsFragment;
-import com.example.changehome.ui.home.HomeFragment;
+import com.example.changehome.fragments.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {

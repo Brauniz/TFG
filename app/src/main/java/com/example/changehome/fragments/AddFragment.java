@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.changehome.R;
 
-import com.example.changehome.activities.ViviendaActivity;
+import com.example.changehome.activities.CreateViviendaActivity;
 import com.example.changehome.adaptador.ViviendaAdapter;
 
 import com.example.changehome.modelo.entidades.Vivienda;
@@ -79,50 +79,17 @@ public class AddFragment extends Fragment {
 
     private void setupFab() {
         fab.setOnClickListener(v -> {
-            // Corregir: Abrir CreateViviendaActivity, no ViviendaActivity
-            Intent intent = new Intent(getContext(), ViviendaActivity.class);
+            // Abrir CreateViviendaActivity
+            Intent intent = new Intent(getContext(), CreateViviendaActivity.class);
             startActivityForResult(intent, CREATE_VIVIENDA_REQUEST);
         });
     }
 
     private void loadUserViviendas() {
         if (currentUser != null) {
-            // Tu modelo Vivienda no tiene campo creadorId, así que cargamos todas las viviendas
-            // O puedes agregar un campo creadorId a tu modelo Vivienda si quieres filtrar por usuario
+            // Cargar solo las viviendas del usuario actual
             db.collection("vivienda")
-                    .get() // Cargar todas las viviendas por ahora
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            viviendaList.clear();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Vivienda vivienda = document.toObject(Vivienda.class);
-                                // El @DocumentId ya se asigna automáticamente
-                                viviendaList.add(vivienda);
-                            }
-                            viviendaAdapter.actualizarLista(viviendaList); // Usar el método correcto
-
-                            // Mostrar mensaje si no hay viviendas
-                            if (viviendaList.isEmpty()) {
-                                Toast.makeText(getContext(),
-                                        "No hay viviendas disponibles. ¡Crea tu primera vivienda!",
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toast.makeText(getContext(),
-                                    "Error al cargar viviendas: " + task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Versión alternativa si quieres filtrar por usuario (requiere agregar creadorId a Vivienda)
-    private void loadUserViviendasFiltered() {
-        if (currentUser != null) {
-            db.collection("vivienda")
-                    .whereEqualTo("creadorId", currentUser.getUid()) // Esto requiere que agregues creadorId a tu modelo
+                    .whereEqualTo("creadorId", currentUser.getUid())
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -133,10 +100,11 @@ public class AddFragment extends Fragment {
                             }
                             viviendaAdapter.actualizarLista(viviendaList);
 
+                            // Mostrar mensaje si no hay viviendas
                             if (viviendaList.isEmpty()) {
                                 Toast.makeText(getContext(),
                                         "No tienes viviendas creadas. ¡Crea tu primera vivienda!",
-                                        Toast.LENGTH_SHORT).show();
+                                        Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Toast.makeText(getContext(),
@@ -144,6 +112,8 @@ public class AddFragment extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+        } else {
+            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -163,10 +133,10 @@ public class AddFragment extends Fragment {
         loadUserViviendas();
     }
 
-    // Método corregido para añadir una nueva vivienda
+    // Método para añadir una nueva vivienda
     public void addNewVivienda(Vivienda vivienda) {
         if (viviendaAdapter != null) {
-            viviendaAdapter.agregarVivienda(vivienda); // Usar el método correcto del adapter
+            viviendaAdapter.agregarVivienda(vivienda);
         }
     }
 

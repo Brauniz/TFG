@@ -11,18 +11,20 @@ public class Vivienda implements Serializable {
     private String subtitulo;
     private String descripcion;
     private String ciudad;     // Ciudad donde se ubica la vivienda
+    private String creadorId;  // ID del usuario que creó la vivienda
 
     // Constructor vacío requerido por Firebase
     public Vivienda() {
     }
 
     // Constructor con parámetros
-    public Vivienda(String imagen, String titulo, String subtitulo, String descripcion, String ciudad) {
+    public Vivienda(String imagen, String titulo, String subtitulo, String descripcion, String ciudad, String creadorId) {
         this.imagen = imagen;
         this.titulo = titulo;
         this.subtitulo = subtitulo;
         this.descripcion = descripcion;
         this.ciudad = ciudad;
+        this.creadorId = creadorId;
     }
 
     // Getters y Setters
@@ -74,6 +76,14 @@ public class Vivienda implements Serializable {
         this.ciudad = ciudad;
     }
 
+    public String getCreadorId() {
+        return creadorId;
+    }
+
+    public void setCreadorId(String creadorId) {
+        this.creadorId = creadorId;
+    }
+
     @Override
     public String toString() {
         return "Vivienda{" +
@@ -83,8 +93,7 @@ public class Vivienda implements Serializable {
                 ", subtitulo='" + subtitulo + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", ciudad='" + ciudad + '\'' +
+                ", creadorId='" + creadorId + '\'' +
                 '}';
     }
-
-
 }

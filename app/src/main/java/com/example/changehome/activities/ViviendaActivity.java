@@ -106,7 +106,7 @@ public class ViviendaActivity extends AppCompatActivity {
 
         if (titulo != null) {
             // Crear objeto vivienda con los datos recibidos
-            vivienda = new Vivienda(imagen, titulo, subtitulo, descripcion, ciudad);
+            vivienda = new Vivienda(imagen, titulo, subtitulo, descripcion, ciudad, vivienda.getCreadorId());
             vivienda.setDocumentId(id);
             Log.d(TAG, "Vivienda creada desde datos del Intent: " + titulo);
             mostrarDatosVivienda();
